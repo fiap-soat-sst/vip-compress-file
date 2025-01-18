@@ -2,7 +2,8 @@
   "name": "vip-compress-file",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "index.ts",
   "scripts": {
     "check:types": "prettier --check .",
     "fix:types": "prettier --write .",
@@ -30,6 +31,10 @@
     "vitest": "^2.1.4"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.730.0",
+    "@aws-sdk/client-s3": "^3.730.0",
+    "@aws-sdk/client-sqs": "^3.730.0",
+    "@aws-sdk/lib-dynamodb": "^3.730.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
