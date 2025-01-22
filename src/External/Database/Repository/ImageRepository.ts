@@ -1,17 +1,18 @@
-import { Either, Left, Right, isLeft } from '../../../@Shared/Either'
+import { IImageRepository } from '../../../Gateways/IDatabaseRepositoryGateway'
+import { Either, isLeft, Left, Right } from '../../../@Shared/Either'
 import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-export class ImageRepository {
+export class DatabaseRepository implements IImageRepository {
   private client: DynamoDBDocumentClient
-  async getBucket(imagesId: string): Promise<Either<Error, string>> {
+  async getBucket(imagesBucketId: string): Promise<Either<Error, string>> {
     const params = {
       TableName: process.env.AWS_TABLE_IMAGES,
       Key: {
-        imagesId,
+        imagesBucketId,
       },
     }
     try {

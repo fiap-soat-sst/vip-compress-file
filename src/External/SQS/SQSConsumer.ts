@@ -1,10 +1,11 @@
+import { IQueueConsumerGateway } from '../../Gateways/IQueueConsumeGateway'
 import {
   DeleteMessageCommand,
   ReceiveMessageCommand,
   SQSClient,
 } from '@aws-sdk/client-sqs'
 
-export class SQSConsumer {
+export class SQSConsumer implements IQueueConsumerGateway {
   private client
   private queueUrl
 
