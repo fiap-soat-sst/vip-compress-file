@@ -2,7 +2,7 @@ import { isLeft } from '../@Shared/Either'
 import { IImageRepository } from '../Gateways/IDatabaseRepositoryGateway'
 
 export class GetBucketNameFromDynamoDBUseCase {
-  private imageRepository: IImageRepository
+  constructor(private readonly imageRepository: IImageRepository) {}
 
   async execute(messageId: string) {
     const databaseRepository = this.imageRepository

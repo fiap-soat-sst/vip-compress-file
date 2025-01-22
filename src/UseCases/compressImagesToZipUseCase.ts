@@ -1,6 +1,8 @@
-import CompressToZip from '../External/compress/compressToZip'
+import { ICompressGateway } from '../Gateways/ICompressGateway'
 
-export async function compressImagesToZipUseCase(rawImages: string) {
-  const compressToZip = new CompressToZip()
-  compressToZip.compressImagesToZipUseCase(rawImages)
+export class CompressImagesToZipUseCase {
+  constructor(private readonly compressGateway: ICompressGateway) {}
+  async execute(rawImages: string) {
+    this.compressGateway.compressImagesToZipUseCase(rawImages)
+  }
 }
