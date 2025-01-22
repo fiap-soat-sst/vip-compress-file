@@ -1,6 +1,6 @@
-import { Either } from '../../@Shared/Either'
+import { Either } from '../@Shared/Either'
 
-export interface IImageStorage {
+export interface IBucketStorageGateway {
   getImages(bucketName: string): Promise<Either<Error, string>>
   upload(
     file: Buffer,
