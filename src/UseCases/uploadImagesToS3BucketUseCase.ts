@@ -1,3 +1,1 @@
-export async function uploadImagesToS3BucketUseCase(
-  compressedImages: unknown
-) {}
+export async function uploadImagesToS3BucketUseCase(compressedFolder: unknown) {}

@@ -1,13 +1,17 @@
-import { isLeft, Right } from '../@Shared/Either'
-import { DatabaseRepository } from '../Gateways/ImageRepository'
+import { isLeft } from '../@Shared/Either'
+import { IImageRepository } from '../Gateways/IDatabaseRepositoryGateway'
 
-export async function getBucketNameFromDynamoDBUseCase(messageId: string) {
-  const databaseRepository = new DatabaseRepository()
-  const bucketName = await databaseRepository.getBucket(messageId)
+export class GetBucketNameFromDynamoDBUseCase {
+  private imageRepository: IImageRepository
 
-  if (isLeft(bucketName)) {
-    throw new Error('Bucket of the images Not Found')
+  async execute(messageId: string) {
+    const databaseRepository = this.imageRepository
+    const bucketName = await databaseRepository.getBucket(messageId)
+
+    if (isLeft(bucketName)) {
+      throw new Error('Bucket of the images Not Found')
+    }
+
+    return bucketName.value
   }
-
-  return bucketName.value
 }
