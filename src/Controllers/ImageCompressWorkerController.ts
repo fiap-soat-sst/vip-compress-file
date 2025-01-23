@@ -1,7 +1,7 @@
-import { SQSConsumer } from '../External/SQS/SQSConsumer.ts'
-import ImageCompressorService from '../Service/ImageCompressorService.ts'
+import { SQSConsumer } from '../External/SQS/SQSConsumer'
+import ImageCompressorService from '../Service/ImageCompressorService'
 
-import { ICronGateway } from '../Gateways/ICronGateway.ts'
+import { ICronGateway } from '../Gateways/ICronGateway'
 
 export class ImageController {
   private readonly cron: ICronGateway

@@ -7,6 +7,7 @@
     "build": "npx tsc",
     "check:types": "prettier --check .",
     "fix:types": "prettier --write .",
+    "start": "node dist/index.js",
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules --respawn src/index.ts",
     "test": "vitest --config vitest.config.mts --run",
     "test:integration": "vitest --config vitest.config.mts --run",

@@ -1,7 +1,7 @@
-import { DownloadFolderImagesFromS3BucketUseCase } from '../UseCases/downloadFolderImagesFromS3BucketUseCase.ts'
-import { GetBucketNameFromDynamoDBUseCase } from '../UseCases/getBucketNameFromDynamoDBUseCase.ts'
-import { CompressImagesToZipUseCase } from '../UseCases/compressImagesToZipUseCase.ts'
-import { UploadImagesToS3BucketUseCase } from '../UseCases/uploadImagesToS3BucketUseCase.ts'
+import { DownloadFolderImagesFromS3BucketUseCase } from '../UseCases/downloadFolderImagesFromS3BucketUseCase'
+import { GetBucketNameFromDynamoDBUseCase } from '../UseCases/getBucketNameFromDynamoDBUseCase'
+import { CompressImagesToZipUseCase } from '../UseCases/compressImagesToZipUseCase'
+import { UploadImagesToS3BucketUseCase } from '../UseCases/uploadImagesToS3BucketUseCase'
 
 export default class ImageCompressorService {
   private readonly downloadFolderImagesFromS3BucketUseCase: DownloadFolderImagesFromS3BucketUseCase

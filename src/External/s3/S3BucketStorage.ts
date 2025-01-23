@@ -1,5 +1,5 @@
 import { Either, Right, Left } from '../../@Shared/Either'
-import { createWriteStream } from 'fs'
+import fs, { createWriteStream, ReadStream } from 'fs'
 import {
   S3Client,
   GetObjectCommand,
@@ -32,15 +32,17 @@ export class S3BucketStorage implements IBucketStorageGateway {
     }
   }
   async upload(
-    file: Buffer,
+    folderBody: String,
     key: string,
     contentType: string
   ): Promise<Either<Error, string>> {
+    const fileStream = fs.createReadStream(`${folderBody}/}`)
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
       Key: key,
-      Body: file,
+      Body: fileStream,
     }
+
     const command = new PutObjectCommand(params)
 
     try {
