@@ -1,5 +1,5 @@
 import { IImageRepository } from '../../../Gateways/IDatabaseRepositoryGateway'
-import { Either, isLeft, Left, Right } from '../../../@Shared/Either'
+import { Either, Left, Right } from '../../../@Shared/Either'
 import {
   DynamoDBDocumentClient,
   GetCommand,
