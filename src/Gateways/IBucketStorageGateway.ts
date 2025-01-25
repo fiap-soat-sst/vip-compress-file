@@ -1,7 +1,7 @@
 import { Either } from '../@Shared/Either'
 
 export interface IBucketStorageGateway {
-  getImages(bucketName: string): Promise<Either<Error, string>>
+  getImages(bucketName: string): any
   upload(
     folderPath: string,
     key: string,

@@ -1,5 +1,5 @@
 import { Either } from '../@Shared/Either'
 
 export interface IImageRepository {
-  getBucket(key: string): Promise<Either<Error, string>>
+  getBucket(userId: string): Promise<Either<Error, string>>
 }

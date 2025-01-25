@@ -4,15 +4,16 @@ import { CompressImagesToZipUseCase } from '../UseCases/compressImagesToZipUseCa
 import { UploadImagesToS3BucketUseCase } from '../UseCases/uploadImagesToS3BucketUseCase'
 
 export default class ImageCompressorService {
-  private readonly downloadFolderImagesFromS3BucketUseCase: DownloadFolderImagesFromS3BucketUseCase
-  private readonly getBucketNameFromDynamoDBUseCase: GetBucketNameFromDynamoDBUseCase
-  private readonly compressImagesToZipUseCase: CompressImagesToZipUseCase
-  private readonly uploadImagesToS3BucketUseCase: UploadImagesToS3BucketUseCase
-  constructor() {}
-  async execute(messageId: string) {
+  constructor(
+    private readonly downloadFolderImagesFromS3BucketUseCase: DownloadFolderImagesFromS3BucketUseCase,
+    private readonly getBucketNameFromDynamoDBUseCase: GetBucketNameFromDynamoDBUseCase,
+    private readonly compressImagesToZipUseCase: CompressImagesToZipUseCase,
+    private readonly uploadImagesToS3BucketUseCase: UploadImagesToS3BucketUseCase
+  ) {}
+  async execute(userId: string) {
     try {
       const ImagestoZip =
-        await this.getBucketNameFromDynamoDBUseCase.execute(messageId)
+        await this.getBucketNameFromDynamoDBUseCase.execute(userId)
       const folderToBeZipped =
         await this.downloadFolderImagesFromS3BucketUseCase.execute(ImagestoZip)
 

@@ -2,7 +2,7 @@ import { ICompressGateway } from '../../Gateways/ICompressGateway'
 import { readdirSync } from 'fs'
 import admz from 'adm-zip'
 
-export default class CompressToZip implements ICompressGateway {
+export class CompressToZip implements ICompressGateway {
   compressImagesToZipUseCase(rawImagesPath: string) {
     const zip = new admz()
 

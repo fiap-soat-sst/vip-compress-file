@@ -1,3 +1,3 @@
-import './Controllers/ImageController'
+import './Controllers/ImageCompressWorkerController'
 import * as dotenv from 'dotenv'
 dotenv.config()

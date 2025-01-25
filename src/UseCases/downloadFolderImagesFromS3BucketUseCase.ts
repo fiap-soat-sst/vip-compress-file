@@ -1,10 +1,12 @@
 import { IBucketStorageGateway } from '../Gateways/IBucketStorageGateway'
 
 export class DownloadFolderImagesFromS3BucketUseCase {
-  constructor(private imageRepository: IBucketStorageGateway) {}
+  constructor(private bucketStorageGateway: IBucketStorageGateway) {}
 
   async execute(bucketName: string) {
-    const folderToBeZipped = await this.imageRepository.getImages(bucketName)
+    console.log('Downloading folder images from S3 bucket')
+    const folderToBeZipped =
+      await this.bucketStorageGateway.getImages(bucketName)
     return folderToBeZipped.value.toString()
   }
 }
