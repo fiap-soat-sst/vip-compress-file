@@ -21,6 +21,7 @@
     "@types/adm-zip": "^0.5.7",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.11",
+    "@types/node-cron": "^3.0.11",
     "@types/supertest": "^6.0.2",
     "@types/swagger-ui-express": "^4.1.6",
     "@vitest/coverage-v8": "^2.1.4",
@@ -41,6 +42,7 @@
     "@aws-sdk/lib-dynamodb": "^3.730.0",
     "adm-zip": "^0.5.16",
     "dotenv": "^16.4.7",
+    "node-cron": "^3.0.3",
     "reflect-metadata": "^0.2.2",
     "supertest": "^7.0.0",
     "swagger-ui-express": "^5.0.1"
