@@ -4,6 +4,7 @@ import admz from 'adm-zip'
 
 export class CompressToZip implements ICompressGateway {
   compressImagesToZipUseCase(rawImagesPath: string) {
+    console.log('Compressing images to zip')
     const zip = new admz()
 
     var folderToBeZipped = readdirSync(rawImagesPath)
@@ -13,10 +14,8 @@ export class CompressToZip implements ICompressGateway {
       zip.addLocalFile(`${rawImagesPath}/${image}`)
     }
 
-    const imagesZipped = `/${rawImagesPath}.zip`
-
+    const imagesZipped = `${rawImagesPath}.zip`
     zip.writeZip(imagesZipped)
-
     return imagesZipped
   }
 }
