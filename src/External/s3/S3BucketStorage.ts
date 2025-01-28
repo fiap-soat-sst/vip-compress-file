@@ -1,15 +1,15 @@
 import { Either, Right, Left } from '../../@Shared/Either'
-import fs, { createWriteStream } from 'fs'
+import { createReadStream, createWriteStream } from 'fs'
 import { mkdir } from 'fs/promises'
 import {
   S3Client,
   GetObjectCommand,
-  PutObjectCommand,
   ListObjectsV2Command,
 } from '@aws-sdk/client-s3'
 import { IBucketStorageGateway } from '../../Gateways/IBucketStorageGateway'
 import { fromEnv } from '@aws-sdk/credential-providers'
-import { Readable } from 'stream'
+import { Readable, Stream } from 'stream'
+import { Upload } from '@aws-sdk/lib-storage'
 
 export class S3BucketStorage implements IBucketStorageGateway {
   private client: S3Client
@@ -70,27 +70,29 @@ export class S3BucketStorage implements IBucketStorageGateway {
     }
   }
 
-  async upload(
-    folderBody: String,
-    key: string,
-    contentType: string
-  ): Promise<Either<Error, string>> {
-    const fileStream = fs.createReadStream(`${folderBody}/}`)
-    const params = {
-      Bucket: process.env.AWS_ZIP_IMAGES_BUCKET,
-      Key: key,
-      Body: fileStream,
-    }
-
-    const command = new PutObjectCommand(params)
-
+  async upload(FolderToUpload: string): Promise<Either<Error, string>> {
+    console.log('Uploading images to S3 bucket')
+    const readableStream = createReadStream(`${FolderToUpload}.zip`)
+    const pass = new Stream.PassThrough()
     try {
-      await this.client.send(command)
-      const url = `https://${params.Bucket}.s3.amazonaws.com/${params.Key}`
+      const parallelUploads3 = new Upload({
+        client: this.client,
+        params: {
+          Bucket: process.env.AWS_ZIP_IMAGES_BUCKET,
+          Key: `${FolderToUpload}.zip`,
+          Body: pass,
+          ContentType: 'application/zip',
+        },
+      })
 
-      return Right(url)
+      readableStream.pipe(pass)
+      await parallelUploads3.done()
+
+      return Right('File uploaded successfully')
     } catch (error) {
       return Left<Error>(error as Error)
     }
   }
 }
+
+new S3BucketStorage().upload('tozip/mnetc')
