@@ -5,8 +5,10 @@ export class DownloadFolderImagesFromS3BucketUseCase {
 
   async execute(bucketName: string) {
     console.log('Downloading folder images from S3 bucket')
+
     const folderToBeZipped =
-      await this.bucketStorageGateway.getImages(bucketName)
+      await this.bucketStorageGateway.getProcessedImagesToCompact(bucketName)
+
     return folderToBeZipped.value.toString()
   }
 }

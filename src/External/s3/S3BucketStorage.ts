@@ -19,7 +19,10 @@ export class S3BucketStorage implements IBucketStorageGateway {
       region: process.env.AWS_REGION,
     })
   }
-  async getImages(folderKey: string, outputDir = `tozip/${folderKey}`) {
+  async getProcessedImagesToCompact(
+    folderKey: string,
+    outputDir = `tozip/${folderKey}`
+  ) {
     try {
       await mkdir(outputDir, { recursive: true })
 
@@ -31,49 +34,57 @@ export class S3BucketStorage implements IBucketStorageGateway {
       const listResponse = await this.client.send(listCommand)
 
       if (!listResponse.Contents) {
-        return Left('No files found in the specified folder.')
+        console.log('No files found in the specified folder.')
+        return
       }
 
       for (const file of listResponse.Contents) {
-        const fileKey = file.Key
-
-        if (!fileKey) {
-          return Left('No filesKey found')
-        }
-
-        if (!fileKey.endsWith('/')) {
-          console.log(`Downloading ${fileKey}...`)
-
-          const getCommand = new GetObjectCommand({
-            Bucket: process.env.AWS_RAW_IMAGES_BUCKET,
-            Key: fileKey,
-          })
-
-          const getResponse = await this.client.send(getCommand)
-          const fileStream = getResponse.Body
-
-          if (fileStream instanceof Readable) {
-            const fileName = fileKey.split('/').pop()
-            const filePath = `${outputDir}/${fileName}`
-            const writeStream = createWriteStream(filePath)
-
-            fileStream.pipe(writeStream)
-
-            console.log(`Saved ${fileName} to ${filePath}`)
-          } else {
-            console.log(`Error: Unable to read file stream for ${fileKey}`)
-          }
-        }
+        await this.downloadImage(file, outputDir)
       }
     } catch (error) {
       console.error('Error downloading images:', error)
     }
   }
 
-  async upload(FolderToUpload: string): Promise<Either<Error, string>> {
+  private async downloadImage(file: any, outputDir: string) {
+    const fileKey = file.Key
+    if (!fileKey) {
+      console.log('No filesKey found')
+      return
+    }
+    if (fileKey.endsWith('/')) {
+      console.log('No filesKey found')
+      return
+    }
+
+    console.log(`Downloading ${fileKey}...`)
+
+    const getCommand = new GetObjectCommand({
+      Bucket: process.env.AWS_RAW_IMAGES_BUCKET,
+      Key: fileKey,
+    })
+
+    const getResponse = await this.client.send(getCommand)
+    const fileStream = getResponse.Body
+
+    if (!(fileStream instanceof Readable)) {
+      console.log(`Error: Unable to read file stream for ${fileKey}`)
+      return
+    }
+
+    const fileName = fileKey.split('/').pop()
+    const filePath = `${outputDir}/${fileName}`
+    const writeStream = createWriteStream(filePath)
+
+    fileStream.pipe(writeStream)
+  }
+
+  async uploadZipToCompactedBucket(FolderToUpload: string) {
     console.log('Uploading images to S3 bucket')
+
     const readableStream = createReadStream(`${FolderToUpload}.zip`)
     const pass = new Stream.PassThrough()
+
     try {
       const parallelUploads3 = new Upload({
         client: this.client,
@@ -88,11 +99,9 @@ export class S3BucketStorage implements IBucketStorageGateway {
       readableStream.pipe(pass)
       await parallelUploads3.done()
 
-      return Right('File uploaded successfully')
+      console.log('File uploaded successfully')
     } catch (error) {
       return Left<Error>(error as Error)
     }
   }
 }
-
-new S3BucketStorage().upload('tozip/mnetc')

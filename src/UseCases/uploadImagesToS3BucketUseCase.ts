@@ -2,12 +2,8 @@ import { IBucketStorageGateway } from '../Gateways/IBucketStorageGateway'
 
 export class UploadImagesToS3BucketUseCase {
   constructor(private readonly bucketStorageGateway: IBucketStorageGateway) {}
-  async execute(compressedFolder: string) {
+  async execute(localZipFolder: string) {
     console.log('Uploading images to S3 bucket')
-    return this.bucketStorageGateway.upload(
-      compressedFolder,
-      'compressed',
-      'application/zip'
-    )
+    this.bucketStorageGateway.uploadZipToCompactedBucket(localZipFolder)
   }
 }

@@ -5,20 +5,25 @@ import { UploadImagesToS3BucketUseCase } from '../UseCases/uploadImagesToS3Bucke
 
 export default class ImageCompressorService {
   constructor(
-    private readonly downloadFolderImagesFromS3BucketUseCase: DownloadFolderImagesFromS3BucketUseCase,
-    private readonly getBucketNameFromDynamoDBUseCase: GetBucketNameFromDynamoDBUseCase,
-    private readonly compressImagesToZipUseCase: CompressImagesToZipUseCase,
-    private readonly uploadImagesToS3BucketUseCase: UploadImagesToS3BucketUseCase
+    private readonly downloadFolderImagesFromS3Bucket: DownloadFolderImagesFromS3BucketUseCase,
+    private readonly getBucketNameFromDynamoDB: GetBucketNameFromDynamoDBUseCase,
+    private readonly compressImagesToZip: CompressImagesToZipUseCase,
+    private readonly uploadImagesToS3Bucket: UploadImagesToS3BucketUseCase
   ) {}
-  async execute(userId: string) {
+  async execute(UserEmail: string) {
     try {
-      const ImagestoZip =
-        await this.getBucketNameFromDynamoDBUseCase.execute(userId)
-      const folderToBeZipped =
-        await this.downloadFolderImagesFromS3BucketUseCase.execute(ImagestoZip)
+      const processedImagesBucket =
+        await this.getBucketNameFromDynamoDB.execute(UserEmail)
 
-      await this.compressImagesToZipUseCase.execute(folderToBeZipped)
-      await this.uploadImagesToS3BucketUseCase.execute(folderToBeZipped)
+      const folderToBeZipped =
+        await this.downloadFolderImagesFromS3Bucket.execute(
+          processedImagesBucket
+        )
+
+      await this.compressImagesToZip.execute(folderToBeZipped)
+
+      await this.uploadImagesToS3Bucket.execute(folderToBeZipped)
+
       return { status: 'success', message: 'Images compressed successfully' }
     } catch (error) {
       return {

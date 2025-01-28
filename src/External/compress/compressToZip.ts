@@ -3,19 +3,20 @@ import { readdirSync } from 'fs'
 import admz from 'adm-zip'
 
 export class CompressToZip implements ICompressGateway {
-  compressImagesToZipUseCase(rawImagesPath: string) {
+  compressImagesToZip(rawImagesPath: string) {
     console.log('Compressing images to zip')
-    const zip = new admz()
 
-    var folderToBeZipped = readdirSync(rawImagesPath)
+    const zip = new admz()
+    const folderToBeZipped = readdirSync(rawImagesPath)
+    const imagesZipped = `${rawImagesPath}.zip`
 
     for (let i = 0; i < folderToBeZipped.length; i++) {
       const image = folderToBeZipped[i]
       zip.addLocalFile(`${rawImagesPath}/${image}`)
     }
 
-    const imagesZipped = `${rawImagesPath}.zip`
     zip.writeZip(imagesZipped)
+
     return imagesZipped
   }
 }

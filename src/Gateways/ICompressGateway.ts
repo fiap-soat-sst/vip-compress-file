@@ -1,3 +1,3 @@
 export interface ICompressGateway {
-  compressImagesToZipUseCase(rawImages: string): void
+  compressImagesToZip(rawImages: string): void
 }

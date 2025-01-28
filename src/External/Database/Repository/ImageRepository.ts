@@ -12,13 +12,16 @@ export class ImageRepository implements IImageRepository {
     })
   )
   constructor() {}
-  async getBucket(rawImagesBucketName: string): Promise<Either<Error, string>> {
+  async getBucketFromUserEmail(
+    UserEmail: string
+  ): Promise<Either<Error, string>> {
+    console.log('Getting bucket name from DynamoDB')
     const params = {
       TableName: process.env.AWS_DYNAMO_DATABASE,
-      IndexName: 'rawImagesBucketName-index',
-      KeyConditionExpression: 'rawImagesBucketName = :rawImagesBucketName',
+      IndexName: 'email-index',
+      KeyConditionExpression: 'email = :email',
       ExpressionAttributeValues: {
-        ':rawImagesBucketName': rawImagesBucketName,
+        ':email': UserEmail,
       },
     }
     try {
