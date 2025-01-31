@@ -9,7 +9,7 @@ export class GetBucketNameFromDynamoDBUseCase {
     const bucketName = await this.dbRepository.getBucketFromUserEmail(UserEmail)
 
     if (isLeft(bucketName)) {
-      throw new Error('Bucket of the images Not Found')
+      return Error('Bucket of the images Not Found')
     }
 
     return bucketName.value

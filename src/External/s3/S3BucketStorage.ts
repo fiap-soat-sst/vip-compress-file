@@ -81,11 +81,9 @@ export class S3BucketStorage implements IBucketStorageGateway {
 
   async uploadZipToCompactedBucket(FolderToUpload: string) {
     console.log('Uploading images to S3 bucket')
-
-    const readableStream = createReadStream(`${FolderToUpload}.zip`)
-    const pass = new Stream.PassThrough()
-
     try {
+      const readableStream = createReadStream(`${FolderToUpload}.zip`)
+      const pass = new Stream.PassThrough()
       const parallelUploads3 = new Upload({
         client: this.client,
         params: {

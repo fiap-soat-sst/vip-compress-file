@@ -1,19 +1,30 @@
 services:
-  app:
-    build: .
-    restart: on-failure
+  # app:
+  #   build: .
+  #   restart: on-failure
+  #   ports:
+  #     - ${PORT}:${PORT}
+  #   networks:
+  #     - backend
+  #   environment:
+  #     PORT: ${PORT}
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '1'
+  #         memory: 1GB
+  #   command: sh -c "npm start"
+  localstack:
+    image: localstack/localstack
     ports:
-      - ${PORT}:${PORT}
-    networks:
-      - backend
+      - "4566:4566"
+      - "4510-4559:4510-4559"
     environment:
-      PORT: ${PORT}
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1GB
-    command: sh -c "npm start"
+      - SERVICES=s3,dynamodb,sqs
+      - DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
 networks:
   backend:
     driver: bridge
