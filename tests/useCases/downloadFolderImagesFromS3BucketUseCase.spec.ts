@@ -2,6 +2,7 @@
 import { DownloadFolderImagesFromS3BucketUseCase } from '../../src/UseCases/downloadFolderImagesFromS3BucketUseCase'
 import { S3BucketStorage } from '../../src/External/s3/S3BucketStorage'
 import { IBucketStorageGateway } from '../../src/Gateways/IBucketStorageGateway'
+import { vi } from 'vitest'
 
 describe('downloadFolderImagesFromS3BucketUseCase', () => {
   let downloadFolderImagesFromS3BucketUseCase: DownloadFolderImagesFromS3BucketUseCase
@@ -14,10 +15,10 @@ describe('downloadFolderImagesFromS3BucketUseCase', () => {
   })
 
   it('should download folder images from S3 bucket', async () => {
-    const bucketName = 'test-bucket'
+    const bucketName = 'mnetc'
     const result =
       await downloadFolderImagesFromS3BucketUseCase.execute(bucketName)
-    expect(result).toBeDefined() // or expect(result).toBe('success message');
+    expect(result).toBeDefined()
   })
 
   it('should throw an error if download fails', async () => {
@@ -28,8 +29,8 @@ describe('downloadFolderImagesFromS3BucketUseCase', () => {
   })
 
   it('should call getProcessedImagesToCompact method on bucketStorageGateway', async () => {
-    const bucketName = 'test-bucket'
-    const getProcessedImagesToCompactSpy = jest.spyOn(
+    const bucketName = 'mnetc'
+    const getProcessedImagesToCompactSpy = vi.spyOn(
       bucketStorageGateway,
       'getProcessedImagesToCompact'
     )

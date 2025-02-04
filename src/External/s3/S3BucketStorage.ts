@@ -30,23 +30,26 @@ export class S3BucketStorage implements IBucketStorageGateway {
         Bucket: process.env.AWS_RAW_IMAGES_BUCKET,
         Prefix: folderKey,
       })
-
       const listResponse = await this.client.send(listCommand)
-
+      console.log('bananana')
+      
       if (!listResponse.Contents) {
         console.log('No files found in the specified folder.')
         return
       }
-
+      
       for (const file of listResponse.Contents) {
         await this.downloadImage(file, outputDir)
       }
+      console.log('bananana')
+      console.log(`Images downloaded to ${outputDir}`)
+      return Right(outputDir)
     } catch (error) {
       console.error('Error downloading images:', error)
     }
   }
 
-  private async downloadImage(file: any, outputDir: string) {
+  async downloadImage(file: any, outputDir: string) {
     const fileKey = file.Key
     if (!fileKey) {
       console.log('No filesKey found')
@@ -79,27 +82,32 @@ export class S3BucketStorage implements IBucketStorageGateway {
     fileStream.pipe(writeStream)
   }
 
-  async uploadZipToCompactedBucket(FolderToUpload: string) {
-    console.log('Uploading images to S3 bucket')
-    try {
+  uploadZipToCompactedBucket(FolderToUpload: string) {
+    return new Promise(async (resolve, reject) => {
+      console.log('Uploading images to S3 bucket')
       const readableStream = createReadStream(`${FolderToUpload}.zip`)
-      const pass = new Stream.PassThrough()
-      const parallelUploads3 = new Upload({
-        client: this.client,
-        params: {
-          Bucket: process.env.AWS_ZIP_IMAGES_BUCKET,
-          Key: `${FolderToUpload}.zip`,
-          Body: pass,
-          ContentType: 'application/zip',
-        },
+
+      readableStream.on('error', (error) => {
+        reject(error)
       })
 
-      readableStream.pipe(pass)
-      await parallelUploads3.done()
-
-      console.log('File uploaded successfully')
-    } catch (error) {
-      return Left<Error>(error as Error)
-    }
+      const pass = new Stream.PassThrough()
+      try {
+        const parallelUploads3 = new Upload({
+          client: this.client,
+          params: {
+            Bucket: process.env.AWS_ZIP_IMAGES_BUCKET,
+            Key: `${FolderToUpload}.zip`,
+            Body: pass,
+            ContentType: 'application/zip',
+          },
+        })
+        readableStream.pipe(pass)
+        await parallelUploads3.done()
+        console.log('File uploaded successfully')
+      } catch (error) {
+        reject(Left<Error>(error as Error))
+      }
+    })
   }
 }

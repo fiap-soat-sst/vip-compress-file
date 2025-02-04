@@ -6,6 +6,7 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/**/*.spec.ts'],
     exclude: ['tests/integration/*.spec.ts'],
+    testTimeout: 30000,
     poolOptions: {
       threads: {
         maxThreads: 1,

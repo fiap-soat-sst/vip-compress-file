@@ -9,6 +9,6 @@ export class DownloadFolderImagesFromS3BucketUseCase {
     const folderToBeZipped =
       await this.bucketStorageGateway.getProcessedImagesToCompact(bucketName)
 
-    return folderToBeZipped.value.toString()
+      return folderToBeZipped.value.toString()
   }
 }
