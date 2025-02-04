@@ -1,71 +1,35 @@
 import { vi } from 'vitest'
-import { S3BucketStorage } from '../../src/External/s3/S3BucketStorage'
 import { Readable } from 'stream'
-import { V } from 'vitest/dist/chunks/reporters.D7Jzd9GS'
+import { fromEnv } from '@aws-sdk/credential-providers'
 
-// Mock the entire S3BucketStorage class
-export const mockS3BucketStorage = () => {
-  const mockDownloadImage = vi.fn()
-  const mockUploadZipToCompactedBucket = vi.fn()
-
-  const mockS3BucketStorageInstance = {
-    getProcessedImagesToCompact: vi.fn(),
-    downloadImage: mockDownloadImage,
-    uploadZipToCompactedBucket: mockUploadZipToCompactedBucket,
-  }
-
-  // Mock the constructor to return the mock instance
-  vi.spyOn(
-    S3BucketStorage.prototype,
-    'getProcessedImagesToCompact'
-  ).mockImplementation(mockS3BucketStorageInstance.getProcessedImagesToCompact)
-
-  vi.spyOn(S3BucketStorage.prototype, 'downloadImage').mockImplementation(
-    mockDownloadImage
-  )
-  vi.spyOn(
-    S3BucketStorage.prototype,
-    'uploadZipToCompactedBucket'
-  ).mockImplementation(mockUploadZipToCompactedBucket)
-
-  return mockS3BucketStorageInstance
-}
-
-// Mock the S3Client and related AWS SDK dependencies
 export const mockS3Client = () => {
-  const mockSend = vi.fn((command: any) => {})
+  const mockSend = vi.fn()
 
   const mockS3ClientInstance = {
-    send: vi.fn().mockImplementation(mockSend),
+    send: mockSend,
     config: {
-      Region: process.env.AWS_REGION,
+      endpoint: process.env.AWS_ENDPOINT,
+      region: process.env.AWS_REGION,
     },
   }
 
+  // Mock the S3Client and its commands
   vi.mock('@aws-sdk/client-s3', () => ({
     S3Client: vi.fn(() => mockS3ClientInstance),
-    GetObjectCommand: vi.fn(() => mockS3ClientInstance),
-    ListObjectsV2Command: vi.fn(() => mockS3ClientInstance),
+    GetObjectCommand: vi.fn((args) => args), // Mock as a function that returns its arguments
+    ListObjectsV2Command: vi.fn((args) => args), // Mock as a function that returns its arguments
   }))
 
+  // Mock the Upload class from @aws-sdk/lib-storage
   vi.mock('@aws-sdk/lib-storage', () => ({
     Upload: vi.fn(() => ({
       done: vi.fn().mockResolvedValue({}),
     })),
   }))
 
-  vi.mock('@aws-sdk/credential-providers', () => ({
-    fromEnv: vi.fn().mockReturnValue({
-      accessKeyId: 'mockAccessKeyId',
-      secretAccessKey: 'mockSecretAccessKey',
-      region: 'us-east-1',
-    }),
-  }))
-
   return mockS3ClientInstance
 }
 
-// Mock the fs and fs/promises modules
 export const mockFs = () => {
   vi.mock('fs', () => ({
     createReadStream: vi.fn(() => {
@@ -82,13 +46,12 @@ export const mockFs = () => {
   }))
 }
 
-// Mock the fromEnv function from @aws-sdk/credential-providers
 export const mockFromEnv = () => {
   vi.mock('@aws-sdk/credential-providers', () => ({
-    fromEnv: vi.fn().mockReturnValue({
-      accessKeyId: 'mockAccessKeyId',
-      secretAccessKey: 'mockSecretAccessKey',
-    }),
+    fromEnv: vi.fn(() => ({
+      accessKeyId: 'test',
+      secretAccessKey: 'test',
+    })),
   }))
 }
 
@@ -97,6 +60,8 @@ export const setEnvs = () => {
   process.env.AWS_REGION = 'us-east-1'
   process.env.AWS_RAW_IMAGES_BUCKET = 'raw-images-bucket'
   process.env.AWS_COMPACTED_IMAGES_BUCKET = 'compacted-images-bucket'
+  process.env.AWS_ACCESS_KEY_ID = 'test'
+  process.env.AWS_SECRET_ACCESS_KEY = 'test'
 }
 
 // Combine all mocks
@@ -105,5 +70,4 @@ export const setupMocks = () => {
   mockFs()
   mockFromEnv()
   setEnvs()
-  return mockS3BucketStorage()
 }

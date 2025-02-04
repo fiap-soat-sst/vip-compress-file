@@ -12,7 +12,7 @@ import { Readable, Stream } from 'stream'
 import { Upload } from '@aws-sdk/lib-storage'
 
 export class S3BucketStorage implements IBucketStorageGateway {
-  private client: S3Client
+  client: S3Client
   constructor() {
     this.client = new S3Client({
       credentials: fromEnv(),
@@ -31,18 +31,16 @@ export class S3BucketStorage implements IBucketStorageGateway {
         Prefix: folderKey,
       })
       const listResponse = await this.client.send(listCommand)
-      console.log('bananana')
-      
+
       if (!listResponse.Contents) {
         console.log('No files found in the specified folder.')
         return
       }
-      
+
       for (const file of listResponse.Contents) {
         await this.downloadImage(file, outputDir)
       }
-      console.log('bananana')
-      console.log(`Images downloaded to ${outputDir}`)
+
       return Right(outputDir)
     } catch (error) {
       console.error('Error downloading images:', error)

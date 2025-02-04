@@ -28,8 +28,7 @@ export class ImageRepository implements IImageRepository {
     try {
       const result = await this.client.send(new GetItemCommand(params))
 
-      if (!result.Item) {
-        console.log('Bucket of the images Not Found')
+      if (!result?.Item?.rawImagesBucketName?.S) {
         return Left<Error>(new Error('Bucket of the images Not Found'))
       }
 
@@ -42,7 +41,6 @@ export class ImageRepository implements IImageRepository {
 
       return Right(bucketName)
     } catch (error) {
-      console.log('Error getting bucket name from DynamoDB:', error)
       return Left<Error>(error as Error)
     }
   }

@@ -29,7 +29,7 @@ export class ImageCompressWorkerController {
     setInterval(async () => {
       const messages = await this.sqsService.receiveMessages()
 
-      if (!messages.length) {
+      if (!messages?.length) {
         console.log('no new messages')
         return
       }

@@ -9,7 +9,12 @@ export default defineConfig({
       enabled: true,
       reporter: ['lcov', 'cobertura', 'text'],
       include: ['src/**/*.ts'],
-      exclude: ['**/External/*'],
+      exclude: [
+        '**/UseCases/*',
+        '**/Gateways/*',
+        'src/@Shared/*',
+        'src/index.ts',
+      ],
     },
   },
 })
