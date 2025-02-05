@@ -1,11 +1,13 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
+import { fromEnv } from '@aws-sdk/credential-providers'
 
 export class DynamoDBAdapter {
   private dynamoDB: DynamoDBDocumentClient
 
   constructor() {
     const client = new DynamoDBClient({
+      credentials: fromEnv(),
       region: process.env.AWS_REGION,
     })
 

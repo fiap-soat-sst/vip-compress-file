@@ -4,13 +4,17 @@ import {
   ReceiveMessageCommand,
   SQSClient,
 } from '@aws-sdk/client-sqs'
+import { fromEnv } from '@aws-sdk/credential-providers'
 
 export class SQSConsumer implements IQueueConsumerGateway {
   private client
   private queueUrl
 
   constructor(queue: string) {
-    this.client = new SQSClient({})
+    this.client = new SQSClient({
+      credentials: fromEnv(),
+      region: process.env.AWS_REGION,
+    })
     this.queueUrl = queue
   }
 
@@ -19,7 +23,7 @@ export class SQSConsumer implements IQueueConsumerGateway {
       const receiveMessageCommand = new ReceiveMessageCommand({
         QueueUrl: this.queueUrl,
         MaxNumberOfMessages: 10,
-        WaitTimeSeconds: 20,
+        WaitTimeSeconds: 5,
         MessageAttributeNames: ['All'],
       })
       const response = await this.client.send(receiveMessageCommand)

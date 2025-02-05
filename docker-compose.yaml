@@ -1,49 +1,30 @@
 services:
-  app:
-    build: .
-    restart: on-failure
+  # app:
+  #   build: .
+  #   restart: on-failure
+  #   ports:
+  #     - ${PORT}:${PORT}
+  #   networks:
+  #     - backend
+  #   environment:
+  #     PORT: ${PORT}
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '1'
+  #         memory: 1GB
+  #   command: sh -c "npm start"
+  localstack:
+    image: localstack/localstack
     ports:
-      - ${PORT}:${PORT}
-    depends_on:
-      mysql_self:
-        condition: service_healthy
-    networks:
-      - backend
+      - "4566:4566"
+      - "4510-4559:4510-4559"
     environment:
-      DB_TYPE: ${DB_TYPE}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_DATABASE: ${DB_DATABASE}
-      PORT: ${PORT}
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1GB
-    command: sh -c "npm start"
-  mysql_self:
-    image: mysql:5.7
-    restart: on-failure
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      DB_PORT: ${DB_PORT}
-    ports:
-      - ${DB_PORT}:${DB_PORT}
-    networks:
-      - backend
+      - SERVICES=s3,dynamodb,sqs
+      - DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
     volumes:
-      - /var/lib/mysql-self
-    healthcheck:
-      test: mysqladmin ping -h localhost -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
+      - "/var/run/docker.sock:/var/run/docker.sock"
 networks:
   backend:
     driver: bridge

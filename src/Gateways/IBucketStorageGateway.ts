@@ -1,10 +1,5 @@
-import { Either } from '../@Shared/Either'
-
 export interface IBucketStorageGateway {
-  getImages(bucketName: string): Promise<Either<Error, string>>
-  upload(
-    file: Buffer,
-    key: string,
-    contentType: string
-  ): Promise<Either<Error, string>>
+  client: any
+  getProcessedImagesToCompact(bucketName: string): any
+  uploadZipToCompactedBucket(FolderToUpload: string): any
 }
