@@ -4,12 +4,29 @@ import { DownloadFolderImagesFromS3BucketUseCase } from '../../src/UseCases/down
 import { GetBucketNameFromDynamoDBUseCase } from '../../src/UseCases/getBucketNameFromDynamoDBUseCase'
 import { CompressImagesToZipUseCase } from '../../src/UseCases/compressImagesToZipUseCase'
 import { UploadImagesToS3BucketUseCase } from '../../src/UseCases/uploadImagesToS3BucketUseCase'
+import { MessageData } from '../../src/Entities/MessageData'
+import { Video } from '../../src/Entities/video'
 
 // Mock dependencies
 vi.mock('../../src/UseCases/downloadFolderImagesFromS3BucketUseCase')
 vi.mock('../../src/UseCases/getBucketNameFromDynamoDBUseCase')
 vi.mock('../../src/UseCases/compressImagesToZipUseCase')
 vi.mock('../../src/UseCases/uploadImagesToS3BucketUseCase')
+
+const video = new Video({
+  id: 'video-id',
+  name: 'video-name',
+  hash: 'folder-to-zip',
+  size: 100,
+  contentType: 'video/mp4',
+  managerService: { url: 'manager-service-url' },
+  processService: { images: [{ url: 'image-url' }] },
+})
+
+const messageData = new MessageData({
+  email: 'user@example.com',
+  video: video,
+})
 
 describe('ImageCompressorService', () => {
   let imageCompressorService: ImageCompressorService
@@ -70,8 +87,23 @@ describe('ImageCompressorService', () => {
     mockCompressImagesToZip.execute.mockResolvedValueOnce(undefined)
     mockUploadImagesToS3Bucket.execute.mockResolvedValueOnce(undefined)
 
+    const video = new Video({
+      id: 'video-id',
+      name: 'video-name',
+      hash: 'folder-to-zip',
+      size: 100,
+      contentType: 'video/mp4',
+      managerService: { url: 'manager-service-url' },
+      processService: { images: [{ url: 'image-url' }] },
+    })
+
+    const messageData = new MessageData({
+      email: 'user@example.com',
+      video: video,
+    })
+
     // Call the execute method
-    const result = await imageCompressorService.execute('user@example.com')
+    const result = await imageCompressorService.execute(messageData)
 
     // Verify the result
     expect(result).toEqual({
@@ -101,7 +133,7 @@ describe('ImageCompressorService', () => {
     )
 
     // Call the execute method
-    const result = await imageCompressorService.execute('user@example.com')
+    const result = await imageCompressorService.execute(messageData)
 
     // Verify the result
     expect(result).toEqual({
@@ -128,7 +160,7 @@ describe('ImageCompressorService', () => {
     )
 
     // Call the execute method
-    const result = await imageCompressorService.execute('user@example.com')
+    const result = await imageCompressorService.execute(messageData)
 
     // Verify the result
     expect(result).toEqual({
@@ -160,7 +192,7 @@ describe('ImageCompressorService', () => {
     )
 
     // Call the execute method
-    const result = await imageCompressorService.execute('user@example.com')
+    const result = await imageCompressorService.execute(messageData)
 
     // Verify the result
     expect(result).toEqual({
@@ -195,7 +227,7 @@ describe('ImageCompressorService', () => {
     )
 
     // Call the execute method
-    const result = await imageCompressorService.execute('user@example.com')
+    const result = await imageCompressorService.execute(messageData)
 
     // Verify the result
     expect(result).toEqual({
