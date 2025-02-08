@@ -3,13 +3,15 @@ import { CompressImagesToZipUseCase } from '../UseCases/compressImagesToZipUseCa
 import { UploadImagesToS3BucketUseCase } from '../UseCases/uploadImagesToS3BucketUseCase'
 import { AddImagesCompressedToDynamoDB } from '../UseCases/AddImagesCompressedToDynamoDB'
 import { MessageData } from '../Entities/MessageData'
+import { INotificationGateway } from '../Gateways/Notification/INotificationGateway'
 
 export default class ImageCompressorService {
   constructor(
     private readonly downloadFolderImagesFromS3Bucket: DownloadFolderImagesFromS3BucketUseCase,
     private readonly addImagesCompressedToDynamoDB: AddImagesCompressedToDynamoDB,
     private readonly compressImagesToZip: CompressImagesToZipUseCase,
-    private readonly uploadImagesToS3Bucket: UploadImagesToS3BucketUseCase
+    private readonly uploadImagesToS3Bucket: UploadImagesToS3BucketUseCase,
+    private readonly notificationGateway: INotificationGateway
   ) {}
   async execute(messageData: MessageData) {
     try {
@@ -30,8 +32,20 @@ export default class ImageCompressorService {
         bucketNameURL.toString()
       )
 
+      this.notificationGateway.sendEmail({
+        type: 'SUCCESS',
+        videoId: '', // video.id,
+        email: messageData.email,
+        message: 'Images compressed successfully',
+      })
       return { status: 'success', message: 'Images compressed successfully' }
-    } catch (error) {
+    } catch (error: any) {
+      this.notificationGateway.sendEmail({
+        type: 'ERROR',
+        videoId: '', // video.id,
+        email: messageData.email,
+        message: error.message,
+      })
       return {
         status: 'error',
         message: `Error compressing images. ${error}`,

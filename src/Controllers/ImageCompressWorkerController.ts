@@ -8,6 +8,7 @@ import { S3BucketStorage } from '../External/s3/S3BucketStorage'
 import { ImageRepository } from '../External/Database/Repository/ImageRepository'
 import { CompressToZip } from '../External/compress/compressToZip'
 import { Either, Left, Right } from '../@Shared/Either'
+import { NotificationGateway } from '../Gateways/Notification/NotificationGateway'
 
 export class ImageCompressWorkerController {
   private readonly imageCompressorService: ImageCompressorService =
@@ -15,7 +16,8 @@ export class ImageCompressWorkerController {
       new DownloadFolderImagesFromS3BucketUseCase(new S3BucketStorage()),
       new AddImagesCompressedToDynamoDB(new ImageRepository()),
       new CompressImagesToZipUseCase(new CompressToZip()),
-      new UploadImagesToS3BucketUseCase(new S3BucketStorage())
+      new UploadImagesToS3BucketUseCase(new S3BucketStorage()),
+      new NotificationGateway()
     )
   private readonly AWS_PROCESS_TO_COMPRESS_QUEUE: string =
     process.env.AWS_PROCESS_TO_COMPRESS_QUEUE ?? ''
