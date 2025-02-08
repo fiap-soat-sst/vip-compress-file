@@ -18,18 +18,17 @@ export class SQSConsumer implements IQueueConsumerGateway {
     this.queueUrl = queue
   }
 
-  async receiveMessages() {
+  async receiveMessages(): Promise<any | null> {
     try {
       const receiveMessageCommand = new ReceiveMessageCommand({
         QueueUrl: this.queueUrl,
-        MaxNumberOfMessages: 10,
+        MaxNumberOfMessages: 1,
         WaitTimeSeconds: 5,
         MessageAttributeNames: ['All'],
       })
       const response = await this.client.send(receiveMessageCommand)
-      const messages = response?.Messages?.length ? response.Messages : []
 
-      return messages
+      return response.Messages ? response.Messages : null
     } catch (err) {
       throw err
     }

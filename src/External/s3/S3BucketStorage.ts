@@ -22,7 +22,7 @@ export class S3BucketStorage implements IBucketStorageGateway {
   async getProcessedImagesToCompact(
     folderKey: string,
     outputDir = `tozip/${folderKey}`
-  ) {
+  ): Promise<Either<Error, string>> {
     try {
       await mkdir(outputDir, { recursive: true })
 
@@ -33,8 +33,7 @@ export class S3BucketStorage implements IBucketStorageGateway {
       const listResponse = await this.client.send(listCommand)
 
       if (!listResponse.Contents) {
-        console.log('No files found in the specified folder.')
-        return
+        return Left<Error>(new Error('No files found in the specified folder.'))
       }
 
       for (const file of listResponse.Contents) {
@@ -43,7 +42,7 @@ export class S3BucketStorage implements IBucketStorageGateway {
 
       return Right(outputDir)
     } catch (error) {
-      console.error('Error downloading images:', error)
+      return Left<Error>(error as Error)
     }
   }
 
@@ -80,17 +79,19 @@ export class S3BucketStorage implements IBucketStorageGateway {
     fileStream.pipe(writeStream)
   }
 
-  uploadZipToCompactedBucket(FolderToUpload: string) {
+  uploadZipToCompactedBucket(
+    FolderToUpload: string
+  ): Promise<Either<Error, boolean>> {
     return new Promise(async (resolve, reject) => {
       console.log('Uploading images to S3 bucket')
-      const readableStream = createReadStream(`${FolderToUpload}.zip`)
-
-      readableStream.on('error', (error) => {
-        reject(error)
-      })
-
-      const pass = new Stream.PassThrough()
       try {
+        const readableStream = createReadStream(`${FolderToUpload}.zip`)
+
+        readableStream.on('error', (error) => {
+          reject(error)
+        })
+
+        const pass = new Stream.PassThrough()
         const parallelUploads3 = new Upload({
           client: this.client,
           params: {
@@ -100,9 +101,11 @@ export class S3BucketStorage implements IBucketStorageGateway {
             ContentType: 'application/zip',
           },
         })
+
         readableStream.pipe(pass)
         await parallelUploads3.done()
-        console.log('File uploaded successfully')
+
+        resolve(Right(true))
       } catch (error) {
         reject(Left<Error>(error as Error))
       }

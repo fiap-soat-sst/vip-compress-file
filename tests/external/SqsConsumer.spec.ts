@@ -46,7 +46,7 @@ describe('SQSConsumer', () => {
     expect(messages).toEqual(mockMessages)
     expect(ReceiveMessageCommand).toHaveBeenCalledWith({
       QueueUrl: 'mock-queue-url',
-      MaxNumberOfMessages: 10,
+      MaxNumberOfMessages: 1,
       WaitTimeSeconds: 5,
       MessageAttributeNames: ['All'],
     })
@@ -56,10 +56,10 @@ describe('SQSConsumer', () => {
   it('should return an empty array if no messages are received', async () => {
     mockSend.mockResolvedValueOnce({})
     const messages = await sqsConsumer.receiveMessages()
-    expect(messages).toEqual([])
+    expect(messages).toEqual(null)
     expect(ReceiveMessageCommand).toHaveBeenCalledWith({
       QueueUrl: 'mock-queue-url',
-      MaxNumberOfMessages: 10,
+      MaxNumberOfMessages: 1,
       WaitTimeSeconds: 5,
       MessageAttributeNames: ['All'],
     })
@@ -73,7 +73,7 @@ describe('SQSConsumer', () => {
     )
     expect(ReceiveMessageCommand).toHaveBeenCalledWith({
       QueueUrl: 'mock-queue-url',
-      MaxNumberOfMessages: 10,
+      MaxNumberOfMessages: 1,
       WaitTimeSeconds: 5,
       MessageAttributeNames: ['All'],
     })

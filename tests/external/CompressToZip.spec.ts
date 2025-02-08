@@ -45,6 +45,9 @@ describe('CompressToZip', () => {
 
     // Verify that writeZip was called with the correct output path
     expect(writeZipMock).toHaveBeenCalledWith(expectedZipPath)
-    expect(result).toBe(expectedZipPath)
+    expect(result).toEqual({
+      tag: 'right',
+      value: expectedZipPath,
+    })
   })
 })

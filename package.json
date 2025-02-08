@@ -43,6 +43,7 @@
     "@aws-sdk/lib-dynamodb": "^3.730.0",
     "@aws-sdk/lib-storage": "^3.735.0",
     "adm-zip": "^0.5.16",
+    "aws-sdk-client-mock": "^4.1.0",
     "dockerode": "^4.0.4",
     "dotenv": "^16.4.7",
     "node-cron": "^3.0.3",
