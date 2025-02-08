@@ -84,14 +84,14 @@ export class S3BucketStorage implements IBucketStorageGateway {
   ): Promise<Either<Error, boolean>> {
     return new Promise(async (resolve, reject) => {
       console.log('Uploading images to S3 bucket')
-      const readableStream = createReadStream(`${FolderToUpload}.zip`)
-
-      readableStream.on('error', (error) => {
-        reject(error)
-      })
-
-      const pass = new Stream.PassThrough()
       try {
+        const readableStream = createReadStream(`${FolderToUpload}.zip`)
+
+        readableStream.on('error', (error) => {
+          reject(error)
+        })
+
+        const pass = new Stream.PassThrough()
         const parallelUploads3 = new Upload({
           client: this.client,
           params: {

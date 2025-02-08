@@ -7,6 +7,7 @@ import { AddImagesCompressedToDynamoDB } from '../UseCases/AddImagesCompressedTo
 import { S3BucketStorage } from '../External/s3/S3BucketStorage'
 import { ImageRepository } from '../External/Database/Repository/ImageRepository'
 import { CompressToZip } from '../External/compress/compressToZip'
+import { Either, Left, Right } from '../@Shared/Either'
 
 export class ImageCompressWorkerController {
   private readonly imageCompressorService: ImageCompressorService =
@@ -23,16 +24,23 @@ export class ImageCompressWorkerController {
   )
   public async run() {
     console.log('ImageCompressWorkerController running')
-    setInterval(async () => {
-      const messages = await this.sqsService.receiveMessages()
+    setInterval(async (): Promise<Either<Error, void>> => {
+      try {
+        const messages = await this.sqsService.receiveMessages()
 
-      if (!messages?.length) {
-        console.log('no new messages')
-        return
+        if (!messages?.length) {
+          return Right(undefined)
+        }
+        for (const message of messages) {
+          const messageData = JSON.parse(message.Body)
+          await this.imageCompressorService.execute(messageData)
+          await this.sqsService.deleteMessage(messages.ReceiptHandle)
+        }
+        return Right(undefined)
+      } catch (error) {
+        console.log('Error in ImageCompressWorkerController', error)
+        return Left<Error>(error as Error)
       }
-
-      this.imageCompressorService.execute(messages)
-      await this.sqsService.deleteMessage(messages.ReceiptHandle)
     }, 5000)
   }
 }

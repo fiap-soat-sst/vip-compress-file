@@ -13,7 +13,7 @@ export default class ImageCompressorService {
   ) {}
   async execute(messageData: MessageData) {
     try {
-      const imagesToZip = messageData.video.hash
+      const imagesToZip = messageData.video.id
 
       const folderToBeZipped =
         await this.downloadFolderImagesFromS3Bucket.execute(imagesToZip)

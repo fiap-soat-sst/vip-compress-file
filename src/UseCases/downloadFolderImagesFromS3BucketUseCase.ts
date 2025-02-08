@@ -1,5 +1,5 @@
 import { IBucketStorageGateway } from '../Gateways/IBucketStorageGateway'
-import { Either, Left, Right } from '../@Shared/Either'
+import { Left, Right } from '../@Shared/Either'
 
 export class DownloadFolderImagesFromS3BucketUseCase {
   constructor(private bucketStorageGateway: IBucketStorageGateway) {}
@@ -9,7 +9,7 @@ export class DownloadFolderImagesFromS3BucketUseCase {
     try {
       const folderToBeZipped =
         await this.bucketStorageGateway.getProcessedImagesToCompact(bucketName)
-      return Right(folderToBeZipped.value.toString())
+      return Right(folderToBeZipped)
     } catch (error) {
       return Left<Error>(error as Error)
     }

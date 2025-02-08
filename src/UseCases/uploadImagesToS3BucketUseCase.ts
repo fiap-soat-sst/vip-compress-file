@@ -8,9 +8,8 @@ export class UploadImagesToS3BucketUseCase {
     try {
       await this.bucketStorageGateway.uploadZipToCompactedBucket(localZipFolder)
 
-      return Right(
-        `https://${process.env.AWS_ZIP_IMAGES_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${hash}.zip`
-      )
+      const bucketUrl = `https://${process.env.AWS_COMPACTED_IMAGES_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${hash}.zip`
+      return Right(bucketUrl)
     } catch (error) {
       return Left<Error>(error as Error)
     }
