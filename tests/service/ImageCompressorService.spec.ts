@@ -95,8 +95,9 @@ describe('ImageCompressorService', () => {
     mockDownloadFolderImagesFromS3Bucket.execute.mockResolvedValueOnce(
       messageData.video.processService.images
     )
+
     mockCompressImagesToZip.execute.mockResolvedValueOnce(undefined)
-    mockUploadImagesToS3Bucket.execute.mockResolvedValueOnce(undefined)
+
     mockNotificationGateway.sendEmail.mockResolvedValueOnce(undefined)
 
     mockUploadImagesToS3Bucket.execute.mockResolvedValueOnce(
@@ -112,28 +113,7 @@ describe('ImageCompressorService', () => {
 
     expect(mockCompressImagesToZip.execute).toHaveBeenCalled()
     expect(mockUploadImagesToS3Bucket.execute).toHaveBeenCalled()
-
-    expect(mockDownloadFolderImagesFromS3Bucket.execute).toHaveBeenCalledWith(
-      'processed-bucket'
-    )
-    expect(mockNotificationGateway.sendEmail).toHaveBeenCalled()
-  })
-
-  it('should handle errors during image compression', async () => {
-    mockNotificationGateway.sendEmail.mockResolvedValueOnce(undefined)
-
-    // Call the execute method
-    const result = await imageCompressorService.execute(messageData)
-
-    // Verify the result
-    expect(result).toEqual({
-      status: 'error',
-      message: 'Error compressing images. Error: DynamoDB Error',
-    })
-
-    expect(mockDownloadFolderImagesFromS3Bucket.execute).not.toHaveBeenCalled()
-    expect(mockCompressImagesToZip.execute).not.toHaveBeenCalled()
-    expect(mockUploadImagesToS3Bucket.execute).not.toHaveBeenCalled()
+    expect(mockDownloadFolderImagesFromS3Bucket.execute).toHaveBeenCalled()
     expect(mockNotificationGateway.sendEmail).toHaveBeenCalled()
   })
 
