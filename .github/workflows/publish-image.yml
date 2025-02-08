@@ -5,8 +5,8 @@ on:
     types: [published]
 
 env:
-  IMAGE_NAME: evilfeeh/self-service-totem
-  EKS_CLUSTER_NAME: self-service-totem
+  IMAGE_NAME: evilfeeh/${{ github.event.repository.name }}
+  EKS_CLUSTER_NAME: ${{ github.event.repository.name }}
   AWS_REGION: us-east-1
   REGISTRY: hub.docker.com
 
@@ -68,8 +68,8 @@ jobs:
 
       - name: Update deployment main image
         run: |
-          kubectl set image deployment/sst-api --namespace=fiap-soat migrate=evilfeeh/self-service-totem:${{ github.event.release.tag_name }} sst-api=evilfeeh/self-service-totem:${{ github.event.release.tag_name }}
+          kubectl set image deployment/${{ github.event.repository.name }} --namespace=vip-fiap-soat migrate=evilfeeh/"${{ github.event.repository.name }}}}:${{ github.event.release.tag_name }} ${{ github.event.repository.name }}=evilfeeh/"${{ github.event.repository.name }}}}:${{ github.event.release.tag_name }}
 
       - name: restart deployment
         run: |
-          kubectl rollout restart deployment sst-api --namespace=fiap-soat
+          kubectl rollout restart deployment ${{ github.event.repository.name }} --namespace=vip-fiap-soat
