@@ -6,12 +6,14 @@ import { UploadImagesToS3BucketUseCase } from '../../src/UseCases/uploadImagesTo
 import { MessageData } from '../../src/Entities/MessageData'
 import { Video } from '../../src/Entities/video'
 import { AddImagesCompressedToDynamoDB } from '../../src/UseCases/AddImagesCompressedToDynamoDB'
+import { NotificationGateway } from '../../src/Gateways/Notification/NotificationGateway'
 
 // Mock dependencies
 vi.mock('../../src/UseCases/downloadFolderImagesFromS3BucketUseCase')
 vi.mock('../../src/UseCases/compressImagesToZipUseCase')
 vi.mock('../../src/UseCases/uploadImagesToS3BucketUseCase')
 vi.mock('../../src/UseCases/AddImagesCompressedToDynamoDB')
+vi.mock('../../src/Gateways/Notification/NotificationGateway')
 
 const video = new Video({
   id: '1c8fb057-89e7-41ac-8abd-09fca2e8defb',
@@ -34,6 +36,7 @@ describe('ImageCompressorService', () => {
   let mockAddImagesCompressedToDynamoDB: any
   let mockCompressImagesToZip: any
   let mockUploadImagesToS3Bucket: any
+  let mockNotificationGateway: any
 
   beforeAll(() => {
     process.env.AWS_COMPACTED_IMAGES_BUCKET = 'test-bucket'
@@ -57,6 +60,9 @@ describe('ImageCompressorService', () => {
     mockAddImagesCompressedToDynamoDB = {
       execute: vi.fn(),
     }
+    mockNotificationGateway = {
+      sendEmail: vi.fn(),
+    }
 
     vi.mocked(AddImagesCompressedToDynamoDB).mockImplementation(
       () => mockAddImagesCompressedToDynamoDB
@@ -70,13 +76,17 @@ describe('ImageCompressorService', () => {
     vi.mocked(UploadImagesToS3BucketUseCase).mockImplementation(
       () => mockUploadImagesToS3Bucket
     )
+    vi.mocked(NotificationGateway).mockImplementation(
+      () => mockNotificationGateway
+    )
 
     // Create an instance of the service
     imageCompressorService = new ImageCompressorService(
       mockDownloadFolderImagesFromS3Bucket,
       mockAddImagesCompressedToDynamoDB,
       mockCompressImagesToZip,
-      mockUploadImagesToS3Bucket
+      mockUploadImagesToS3Bucket,
+      mockNotificationGateway
     )
   })
 
@@ -85,7 +95,10 @@ describe('ImageCompressorService', () => {
     mockDownloadFolderImagesFromS3Bucket.execute.mockResolvedValueOnce(
       messageData.video.processService.images
     )
+
     mockCompressImagesToZip.execute.mockResolvedValueOnce(undefined)
+
+    mockNotificationGateway.sendEmail.mockResolvedValueOnce(undefined)
 
     mockUploadImagesToS3Bucket.execute.mockResolvedValueOnce(
       `https://${process.env.AWS_ZIP_IMAGES_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${video.id}.zip`
@@ -98,17 +111,17 @@ describe('ImageCompressorService', () => {
       message: 'Images compressed successfully',
     })
 
-    // expect(mockDownloadFolderImagesFromS3Bucket.execute).toHaveBeenCalledWith(
-    //   messageData.video.processService.images
-    // )
     expect(mockCompressImagesToZip.execute).toHaveBeenCalled()
     expect(mockUploadImagesToS3Bucket.execute).toHaveBeenCalled()
+    expect(mockDownloadFolderImagesFromS3Bucket.execute).toHaveBeenCalled()
+    expect(mockNotificationGateway.sendEmail).toHaveBeenCalled()
   })
 
   it('should handle errors during image download', async () => {
     mockDownloadFolderImagesFromS3Bucket.execute.mockRejectedValueOnce(
       new Error('S3 Download Error')
     )
+    mockNotificationGateway.sendEmail.mockResolvedValueOnce(undefined)
 
     // Call the execute method
     const result = await imageCompressorService.execute(messageData)
@@ -124,6 +137,7 @@ describe('ImageCompressorService', () => {
     )
     expect(mockCompressImagesToZip.execute).not.toHaveBeenCalled()
     expect(mockUploadImagesToS3Bucket.execute).not.toHaveBeenCalled()
+    expect(mockNotificationGateway.sendEmail).toHaveBeenCalled()
   })
 
   it('should handle errors during image compression', async () => {
@@ -133,6 +147,7 @@ describe('ImageCompressorService', () => {
     mockCompressImagesToZip.execute.mockRejectedValueOnce(
       new Error('Compression Error')
     )
+    mockNotificationGateway.sendEmail.mockResolvedValueOnce(undefined)
 
     // Call the execute method
     const result = await imageCompressorService.execute(messageData)
@@ -150,6 +165,7 @@ describe('ImageCompressorService', () => {
       '1c8fb057-89e7-41ac-8abd-09fca2e8defb'
     )
     expect(mockUploadImagesToS3Bucket.execute).not.toHaveBeenCalled()
+    expect(mockNotificationGateway.sendEmail).toHaveBeenCalled()
   })
 
   it('should handle errors during image upload', async () => {
@@ -160,6 +176,7 @@ describe('ImageCompressorService', () => {
     mockUploadImagesToS3Bucket.execute.mockRejectedValueOnce(
       new Error('S3 Upload Error')
     )
+    mockNotificationGateway.sendEmail.mockResolvedValueOnce(undefined)
 
     const result = await imageCompressorService.execute(messageData)
 
@@ -178,5 +195,6 @@ describe('ImageCompressorService', () => {
       '1c8fb057-89e7-41ac-8abd-09fca2e8defb',
       '1c8fb057-89e7-41ac-8abd-09fca2e8defb'
     )
+    expect(mockNotificationGateway.sendEmail).toHaveBeenCalled()
   })
 })

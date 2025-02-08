@@ -19,6 +19,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/adm-zip": "^0.5.7",
+    "@types/axios": "^0.9.36",
     "@types/dockerode": "^3.3.34",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.11",
@@ -44,6 +45,7 @@
     "@aws-sdk/lib-storage": "^3.735.0",
     "adm-zip": "^0.5.16",
     "aws-sdk-client-mock": "^4.1.0",
+    "axios": "^1.7.9",
     "dockerode": "^4.0.4",
     "dotenv": "^16.4.7",
     "node-cron": "^3.0.3",
